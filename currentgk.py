@@ -386,5 +386,4 @@ async def on_message(message: discord.Message):
 # keep_alive.keep_alive()
 
 a = meido.run(os.environ.get('TOKEN'))
-#a = meido.run("MTAyNDY5NTAxNzUxNzg3NTI4MA.GqlLff.8ciPPRgwteprwpuXxBGj_4xTgLQ18lYr52dibo")
 print(a)
