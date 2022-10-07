@@ -22,7 +22,7 @@ announcementchannelid = 617136489482027059
 kotobaid = 251239170058616833
 guildid = 617136488840429598
 
-ranks = [617990264711151617, 795698879227887678, 795698963494731806, 1026924690029170718, 1026922492884951121, 795699064409948210, 795699163144126474, 795699221365260359, 834998819241459722, 834999083512758293, 1026918330566721576, 1026918224266280960]
+ranks = [795698879227887678, 795698963494731806, 795699064409948210, 795699163144126474, 795699221365260359, 1026918330566721576, 1026918224266280960]
 eternal = [834999083512758293, 1026922492884951121]
 divine = [834999083512758293, 1026924690029170718]
 prima = [834998819241459722, 1027706897731702846]
@@ -244,7 +244,6 @@ async def on_message(message: discord.Message):
             invalid_quiz = discord.utils.utcnow() + timedelta(minutes=5)
             await message.channel.send("Wrong quiz command.")
             return await message.author.timeout(invalid_quiz, reason=f'Wrong quiz command.')
-            #return await message.channel.send(f'Not a ranked quiz or your settings might be wrong.')
     
     if message.author.id == kotobaid:
         myguild = meido.get_guild(617136488840429598)
@@ -255,14 +254,13 @@ async def on_message(message: discord.Message):
                 scorelimit, answertimelimitinms, fontsize, font, quizname, usercount, mainuserid, failedquestioncount, myscore, anticheatinfo, quizcommand = myquiz
                 upperindex, lowerindex, mulitplechoice, shuffle, isloaded = anticheatinfo
                 try:
-                    #print(f'this is the name{quizname} and command {quizcommand}')
                     requirements = myrankstructure[quizname]
                     reqscorelimit, reqanswertime, reqfontsize, reqfont, newrankid, reqfailed, fred = requirements
                 except KeyError:
                     print("Not a ranked quiz.")
                     return
                 else:
-                    #TIMM: added quiz fails to db for one try per week
+                    #TIMM: adding quiz try to db if user failed quiz
                     result = "FAILED"
                     created_at = datetime.now()
                     
@@ -305,6 +303,7 @@ async def on_message(message: discord.Message):
                         print("Too many failed.")
                         return await fail_message(message, mainuserid, quizcommand, created_at, result)
 
+                    #TIMM: allowing eternal/divne idols to skip GN1
                     # role_info = store.get_role_info(mainuserid, newrankid)
                     # if role_info[0][1] == 1026918224266280960 or 1026918224266280960:
                     #     if currentroleid:
@@ -316,10 +315,11 @@ async def on_message(message: discord.Message):
                     #     announcementchannel = meido.get_channel(announcementchannelid)
                     #     return await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
                     
+                    
                     quizwinner = myguild.get_member(mainuserid)
-                    #TIMM: adding quiz try counter
+                    
+                    #TIMM: 
                     result = "PASSED"
-                    ranks = [795698879227887678, 795698963494731806, 795699064409948210, 795699163144126474, 795699221365260359, 1026918330566721576, 1026918224266280960]
                     currentroleid = None
                     for role in quizwinner.roles:
                         if role.id in ranks:
@@ -335,6 +335,7 @@ async def on_message(message: discord.Message):
                     newrole = myguild.get_role(newrankid)
                     await quizwinner.add_roles(newrole)
                     
+                    #TIMM: conditionals for giving eternal/divine/prima idol
                     e = 0
                     d = 0
                     p = 0
