@@ -60,13 +60,22 @@ def init_tables(db_name):
     return
     conn = sqlite3.connect(db_name)
     with conn:
-        conn.execute(_CREATE_CLUBS_TABLE)
+        conn.execute(_CREATE_ATTEMPTS_TABLE)
+        conn.execute(_CREATE_TRIES_TABLE)
 
-_CREATE_CLUBS_TABLE = """
+_CREATE_ATTEMPTS_TABLE = """
 CREATE TABLE IF NOT EXISTS attempts (
     discord_guild_id INTEGER,
     quiz_level TEXT,
     created_at TIMESTAMP,
     result TEXT,
+);
+"""
+
+_CREATE_TRIES_TABLE = """
+CREATE TABLE IF NOT EXISTS tries (
+    discord_guild_id INTEGER,
+    role_id int,
+    created_at TIMESTAMP,
 );
 """
