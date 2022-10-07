@@ -61,7 +61,7 @@ def init_tables(db_name):
     conn = sqlite3.connect(db_name)
     with conn:
         conn.execute(_CREATE_ATTEMPTS_TABLE)
-        conn.execute(_CREATE_TRIES_TABLE)
+        conn.execute(_CREATE_ROLES_TABLE)
 
 _CREATE_ATTEMPTS_TABLE = """
 CREATE TABLE IF NOT EXISTS attempts (
@@ -72,8 +72,8 @@ CREATE TABLE IF NOT EXISTS attempts (
 );
 """
 
-_CREATE_TRIES_TABLE = """
-CREATE TABLE IF NOT EXISTS tries (
+_CREATE_ROLES_TABLE = """
+CREATE TABLE IF NOT EXISTS roles (
     discord_guild_id INTEGER,
     role_id int,
     created_at TIMESTAMP,
