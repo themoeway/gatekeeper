@@ -21,7 +21,7 @@ welcomechannelid = 647924174995587106
 announcementchannelid = 617136489482027059
 kotobaid = 251239170058616833
 guildid = 617136488840429598
-# Test Chat Rank Hierarchy
+
 ranks = [617990264711151617, 795698879227887678, 795698963494731806, 1026924690029170718, 1026922492884951121, 795699064409948210, 795699163144126474, 795699221365260359, 834998819241459722, 834999083512758293, 1026918330566721576, 1026918224266280960]
 eternal = [834999083512758293, 1026922492884951121]
 divine = [834999083512758293, 1026924690029170718]
@@ -161,6 +161,7 @@ async def on_ready():
     init_tables(_DB_NAME)
     print('Done initing tables')
 
+    
 async def get_attempts(mainuserid, quizname):
     con = sqlite3.connect('quiz_attempts.db')
     cur = con.cursor()
@@ -185,6 +186,7 @@ async def fail_message(message, mainuserid, quizcommand, created_at, result):
     except Exception:
         await message.channel.send(f"<@{mainuserid}> please change your privacy settings to ``Allow direct messages from server members``. This way you can keep track of your cool down.")
     
+    
 #TIMM: giving new role and announcing new quizwinner    
 async def give_new_role(myguild, newrankid, quizwinner, mainuserid, fred, role_info, created_at):
     if role_info == []:
@@ -198,6 +200,8 @@ async def give_new_role(myguild, newrankid, quizwinner, mainuserid, fred, role_i
     announcementchannel = meido.get_channel(announcementchannelid)
     await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
     
+
+#TIMM: cooldown message after failed quiz    
 async def cooldown_message(message, mainuserid, quizcommand, logs, created_at):
     unixstamp = store.get_unix()
     await message.channel.send(f"Please attempt again in <t:{int(unixstamp[0])}:R> at <t:{unixstamp[0]}>. Any attempts until then will not be counted.")
