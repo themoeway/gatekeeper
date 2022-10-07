@@ -1,0 +1,4 @@
+bar_chart_race
+discord
+pandas
+tqdm
