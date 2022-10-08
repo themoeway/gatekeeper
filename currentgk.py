@@ -31,7 +31,7 @@ _DB_NAME = 'quiz_attempts.db'
 store = None
 
 
-#TIMM: set globals
+#TIMM: set globals for quiz tries db
 def _set_globals():
     environment = os.environ.get('ENV')
     is_prod = environment == 'prod'
