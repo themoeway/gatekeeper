@@ -17,15 +17,20 @@ from role_db import init_tables, Store
 from datetime import date as new_date, datetime, timedelta
 import time
 
+
 welcomechannelid = 647924174995587106
 announcementchannelid = 617136489482027059
 kotobaid = 251239170058616833
 guildid = 617136488840429598
 
+
+#Student, Trainee, Debut, Major, Prima, Divine, Eternal
 ranks = [795698879227887678, 795698963494731806, 795699064409948210, 795699163144126474, 795699221365260359, 1026918330566721576, 1026918224266280960]
-eternal = [834999083512758293, 1026922492884951121]
-divine = [834999083512758293, 1026924690029170718]
-prima = [834998819241459722, 1027706897731702846]
+eternal = [834999083512758293, 1026922492884951121] #GN1, Eternal
+divine = [834999083512758293, 1026924690029170718] #GN1, Divine
+prima = [834998819241459722, 1027706897731702846] #GN2, Prima
+
+
 #TIMM: globals for quiz_attempts.db connection
 _DB_NAME = 'quiz_attempts.db'
 store = None
@@ -161,23 +166,13 @@ async def on_ready():
     init_tables(_DB_NAME)
     print('Done initing tables')
 
-    
-async def get_attempts(mainuserid, quizname):
-    con = sqlite3.connect('quiz_attempts.db')
-    cur = con.cursor()
-    query = """SELECT EXISTS(
-        SELECT * FROM attempts WHERE discord_user_id = ? AND quiz_level = ? AND created_at >= DATE('now', '-' || STRFTIME('%w') || ' days')
-        ) AS didTry"""
-    data = (mainuserid, quizname)
-    cur = con.cursor()
-    cur.execute(query, data)
-    return cur.fetchall()
-
 
 #TIMM: adding mechanism for storing quiz tries
 async def fail_message(message, mainuserid, quizcommand, created_at, result):
+    #TIMM: unlimited tries for Student role
     if quizcommand == "k!quiz jpdb1k(1-300) 25 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100":
         return
+    #TIMM: storeing try for every non Student ranked quiz
     store.new_quiz_attempt(mainuserid, quizcommand, created_at, result)
     unixstamp = store.get_unix()
     await message.channel.send(f"Please attempt again in <t:{int(unixstamp[0])}:R> at <t:{unixstamp[0]}>. Any attempts until then will not be counted.")
@@ -185,21 +180,7 @@ async def fail_message(message, mainuserid, quizcommand, created_at, result):
         await message.author.send(f'Please attempt again in <t:{int(unixstamp[0])}:R> at <t:{unixstamp[0]}> (UTC). Any attempts on ``{quizcommand}`` until then will not be counted.')
     except Exception:
         await message.channel.send(f"<@{mainuserid}> please change your privacy settings to ``Allow direct messages from server members``. This way you can keep track of your cool down.")
-    
-    
-#TIMM: giving new role and announcing new quizwinner    
-async def give_new_role(myguild, newrankid, quizwinner, mainuserid, fred, role_info, created_at):
-    if role_info == []:
-        store.save_role_info(mainuserid, newrankid, created_at)
-    if role_info != []:
-        store.delete_role_info(mainuserid, newrankid)
-        store.save_role_info(mainuserid, newrankid, created_at)
-    newrole = myguild.get_role(newrankid)
-    buiz = newrole.name
-    await quizwinner.add_roles(newrole)
-    announcementchannel = meido.get_channel(announcementchannelid)
-    await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
-    
+   
 
 #TIMM: cooldown message after failed quiz    
 async def cooldown_message(message, mainuserid, quizcommand, logs, created_at):
@@ -214,7 +195,7 @@ async def cooldown_message(message, mainuserid, quizcommand, logs, created_at):
 # Main Function
 @meido.event
 async def on_message(message: discord.Message): 
-    #TIMM: counting k!stop as a quiz try  
+    #TIMM: counting k!stopand the likes as a quiz try  
     if message.content.startswith("k!stop") or message.content.startswith("k!q stop") or message.content.startswith("k!cancel") or message.content.startswith("k!stop quiz"):
         async for quizinvoke in message.channel.history(limit=64):
             if quizinvoke.author == message.author:
@@ -225,9 +206,11 @@ async def on_message(message: discord.Message):
                     mainuserid = message.author.id
                     return await fail_message(message, mainuserid, quizcommand, created_at, result)               
     
-    #TIMM: checking if user is allowed to do ranked quiz  
+    #TIMM: checking if user does a ranked quiz
     if message.content.startswith("k!quiz jpdb1k") or message.content.startswith("k!quiz jpdb2_5k") or message.content.startswith("k!quiz jpdb2_5k+jpdb5k") or message.content.startswith("k!quiz jpdb5k") or message.content.startswith("k!quiz jpdb5k+jpdb10k") or message.content.startswith("k!quiz jpdb10k") or message.content.startswith("k!quiz jpdb10k+jpdb15k")  or message.content.startswith("k!quiz jpdb15k")or message.content.startswith("k!quiz gn2") or message.content.startswith("k!quiz gn1") or message.content.startswith("k!quiz jpdb15k+jpdb20k")  or message.content.startswith("k!quiz jpdb20k") or message.content.startswith("k!quiz jpdb20k+jpdb25k") or message.content.startswith("k!quiz jpdb25k"):
+        #TIMM: checking if its the exact right command
         if [command[1] for command in mycommands.values() if message.content == command[1]] != []:
+            #TIMM: allowing quiz attempt or timing out
             quizcommand = [command[1] for command in mycommands.values() if message.content == command[1]][0]
             mainuserid = message.author.id
             logs = store.get_attempts(mainuserid, quizcommand)
@@ -302,18 +285,6 @@ async def on_message(message: discord.Message):
                     if failedquestioncount > reqfailed:
                         print("Too many failed.")
                         return await fail_message(message, mainuserid, quizcommand, created_at, result)
-
-                    #TIMM: allowing eternal/divne idols to skip GN1
-                    # role_info = store.get_role_info(mainuserid, newrankid)
-                    # if role_info[0][1] == 1026918224266280960 or 1026918224266280960:
-                    #     if currentroleid:
-                    #         currentrole = myguild.get_role(currentroleid)
-                    #         await quizwinner.remove_roles(currentrole)
-                    #     buiz = newrole.name
-                    #     newrole = myguild.get_role(newrankid)
-                    #     await quizwinner.add_roles(newrole)
-                    #     announcementchannel = meido.get_channel(announcementchannelid)
-                    #     return await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
                     
                     
                    quizwinner = myguild.get_member(mainuserid)
@@ -348,65 +319,26 @@ async def on_message(message: discord.Message):
                             p += 1    
                             flag_role = role.id
                     if e == 2:
-                        # currentrole = myguild.get_role(eternal[0])
-                        # await quizwinner.remove_roles(currentrole)
                         currentrole = myguild.get_role(eternal[1])
                         await quizwinner.remove_roles(currentrole)
                         newrankid = 1026918224266280960 #eternal idol
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, eternal[0], created_at)
-                    # if e == 1:
-                    #     role_available = store.check_existing_role(mainuserid, newrankid)
-                    #     if role_available == 1:
-                    #         skip_role = store.get_role_info(mainuserid, newrankid)
-                    #         if skip_role[1] == 834999083512758293: #gn1
-                    #             currentrole = myguild.get_role(flag_role)
-                    #             await quizwinner.remove_roles(currentrole)
-                    #             newrankid = 1026918224266280960 #eternal idol
-                    #             newrole = myguild.get_role(newrankid)
-                    #             await quizwinner.add_roles(newrole)
-                    #             store.save_role_info(mainuserid, skip_role[1], created_at)
                     if d == 2:
-                        # currentrole = myguild.get_role(divine[0])
-                        # await quizwinner.remove_roles(currentrole)
                         currentrole = myguild.get_role(divine[1])
                         await quizwinner.remove_roles(currentrole)
                         newrankid = 1026918330566721576 #divine idol
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
-                    # if d == 1:
-                    #     role_available = store.check_existing_role(mainuserid, newrankid)
-                    #     if role_available == 1:
-                    #         skip_role = store.get_role_info(mainuserid, newrankid)
-                    #         if skip_role[1] == 834999083512758293: #gn1
-                    #             currentrole = myguild.get_role(flag_role)
-                    #             await quizwinner.remove_roles(currentrole)
-                    #             newrankid = 1026918330566721576 #divine idol
-                    #             newrole = myguild.get_role(newrankid)
-                    #             await quizwinner.add_roles(newrole)
-                    #             store.save_role_info(mainuserid, skip_role[1], created_at)
                     if p == 2: 
-                        # currentrole = myguild.get_role(prima[0])
-                        # await quizwinner.remove_roles(currentrole)
                         currentrole = myguild.get_role(prima[1])
                         await quizwinner.remove_roles(currentrole)
                         newrankid = 795699221365260359 #prima idol
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
-                    # if p == 1:
-                    #     role_available = store.check_existing_role(mainuserid, newrankid)
-                    #     if role_available == 1:
-                    #         skip_role = store.get_role_info(mainuserid, newrankid)
-                    #         if skip_role[1] == 834998819241459722: 
-                    #             currentrole = myguild.get_role(flag_role)
-                    #             await quizwinner.remove_roles(currentrole)
-                    #             newrankid = 795699221365260359
-                    #             newrole = myguild.get_role(newrankid)
-                    #             await quizwinner.add_roles(newrole)
-                    #             store.save_role_info(mainuserid, skip_role[1], created_at)
                     if newrankid == 834998819241459722 or newrankid == 834999083512758293:
                         buiz = newrole.name
                         announcementchannel = meido.get_channel(announcementchannelid)
