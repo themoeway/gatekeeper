@@ -316,9 +316,7 @@ async def on_message(message: discord.Message):
                     #     return await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
                     
                     
-                    quizwinner = myguild.get_member(mainuserid)
-                    
-                    #TIMM: 
+                   quizwinner = myguild.get_member(mainuserid)
                     result = "PASSED"
                     currentroleid = None
                     for role in quizwinner.roles:
@@ -334,50 +332,85 @@ async def on_message(message: discord.Message):
                     #TIMM: making eternal/dvine idol holders skip GN1 when retaking
                     newrole = myguild.get_role(newrankid)
                     await quizwinner.add_roles(newrole)
-                    
+
                     #TIMM: conditionals for giving eternal/divine/prima idol
                     e = 0
                     d = 0
                     p = 0
                     for role in quizwinner.roles:
                         if role.id in eternal:
-                            e += 1
+                            e += 1          
+                            flag_role = role.id
                         if role.id in divine:
                             d += 1
+                            flag_role = role.id
                         if role.id in prima:
                             p += 1    
+                            flag_role = role.id
                     if e == 2:
                         currentrole = myguild.get_role(eternal[0])
                         await quizwinner.remove_roles(currentrole)
                         currentrole = myguild.get_role(eternal[1])
                         await quizwinner.remove_roles(currentrole)
-                        newrankid = 1026918224266280960
+                        newrankid = 1026918224266280960 #eternal idol
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
-                        store.save_role_info(mainuserid, newrankid, created_at)
+                        store.save_role_info(mainuserid, eternal[0], created_at)
+                    if e == 1:
+                        role_available = store.check_existing_role(mainuserid, newrankid)
+                        if role_available == 1:
+                            skip_role = store.get_role_info(mainuserid, newrankid)
+                            if skip_role[1] == 834999083512758293: #gn1
+                                currentrole = myguild.get_role(flag_role)
+                                await quizwinner.remove_roles(currentrole)
+                                newrankid = 1026918224266280960 #eternal idol
+                                newrole = myguild.get_role(newrankid)
+                                await quizwinner.add_roles(newrole)
+                                store.save_role_info(mainuserid, skip_role[1], created_at)
                     if d == 2:
                         currentrole = myguild.get_role(divine[0])
                         await quizwinner.remove_roles(currentrole)
                         currentrole = myguild.get_role(divine[1])
                         await quizwinner.remove_roles(currentrole)
-                        newrankid = 1026918330566721576
+                        newrankid = 1026918330566721576 #divine idol
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
+                    if d == 1:
+                        role_available = store.check_existing_role(mainuserid, newrankid)
+                        if role_available == 1:
+                            skip_role = store.get_role_info(mainuserid, newrankid)
+                            if skip_role[1] == 834999083512758293: #gn1
+                                currentrole = myguild.get_role(flag_role)
+                                await quizwinner.remove_roles(currentrole)
+                                newrankid = 1026918330566721576 #divine idol
+                                newrole = myguild.get_role(newrankid)
+                                await quizwinner.add_roles(newrole)
+                                store.save_role_info(mainuserid, skip_role[1], created_at)
                     if p == 2: 
                         currentrole = myguild.get_role(prima[0])
                         await quizwinner.remove_roles(currentrole)
                         currentrole = myguild.get_role(prima[1])
                         await quizwinner.remove_roles(currentrole)
-                        newrankid = 795699221365260359
+                        newrankid = 795699221365260359 #prima idol
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
+                    if p == 1:
+                        role_available = store.check_existing_role(mainuserid, newrankid)
+                        if role_available == 1:
+                            skip_role = store.get_role_info(mainuserid, newrankid)
+                            if skip_role[1] == 834998819241459722: #gn2
+                                currentrole = myguild.get_role(flag_role)
+                                await quizwinner.remove_roles(currentrole)
+                                newrankid = 795699221365260359 #prima idol
+                                newrole = myguild.get_role(newrankid)
+                                await quizwinner.add_roles(newrole)
+                                store.save_role_info(mainuserid, skip_role[1], created_at)
                     if newrankid == 834998819241459722 or newrankid == 834999083512758293:
                         buiz = newrole.name
                         announcementchannel = meido.get_channel(announcementchannelid)
-                        await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
-                        return
+                        return await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
                     if currentroleid:
                         currentrole = myguild.get_role(currentroleid)
                         await quizwinner.remove_roles(currentrole)
