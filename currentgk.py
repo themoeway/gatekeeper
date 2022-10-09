@@ -318,6 +318,24 @@ async def on_message(message: discord.Message):
                         if role.id in prima:
                             p += 1    
                             flag_role = role.id
+                    if currentroleid == 1026918224266280960 and newrankid == 1026924690029170718: #if you have eternal and you did the divine vocab quiz
+                        eternal_idol = myguild.get_role(currentroleid)
+                        await quizwinner.remove_roles(eternal_idol)
+                        passed_divine_vocab = myguild.get_role(newrankid)
+                        await quizwinner.remove_roles(passed_divine_vocab)
+                        newrankid = 1026918330566721576 #divine idol
+                        newrole = myguild.get_role(newrankid)
+                        await quizwinner.add_roles(newrole)
+                        store.save_role_info(mainuserid, newrankid, created_at)
+                    if currentroleid == 1026918330566721576 and newrankid == 1026922492884951121: #if you have divine and you did the eternal vocab quiz
+                        divine_idol = myguild.get_role(currentroleid)
+                        await quizwinner.remove_roles(divine_idol)
+                        passed_eternal_vocab = myguild.get_role(newrankid)
+                        await quizwinner.remove_roles(passed_eternal_vocab)
+                        newrankid = 1026918224266280960 #eternal idol
+                        newrole = myguild.get_role(newrankid)
+                        await quizwinner.add_roles(newrole)
+                        store.save_role_info(mainuserid, newrankid, created_at)
                     if e == 2:
                         currentrole = myguild.get_role(eternal[1])
                         await quizwinner.remove_roles(currentrole)
