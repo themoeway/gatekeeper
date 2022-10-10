@@ -311,13 +311,10 @@ async def on_message(message: discord.Message):
                     for role in quizwinner.roles:
                         if role.id in eternal:
                             e += 1          
-                            flag_role = role.id
                         if role.id in divine:
                             d += 1
-                            flag_role = role.id
                         if role.id in prima:
                             p += 1    
-                            flag_role = role.id
                     if currentroleid == 1026918224266280960 and newrankid == 1026924690029170718: #if you have eternal and you did the divine vocab quiz
                         eternal_idol = myguild.get_role(currentroleid)
                         await quizwinner.remove_roles(eternal_idol)
@@ -357,6 +354,10 @@ async def on_message(message: discord.Message):
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
+                    if newrankid == 834999083512758293 or newrankid == 834998819241459722:
+                        buiz = newrole.name
+                        announcementchannel = meido.get_channel(announcementchannelid)
+                        await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
                     if currentroleid:
                         currentrole = myguild.get_role(currentroleid)
                         await quizwinner.remove_roles(currentrole)
