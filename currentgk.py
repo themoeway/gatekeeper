@@ -247,12 +247,12 @@ async def on_message(message: discord.Message):
                     result = "FAILED"
                     created_at = datetime.now()
                     
-                    if upperindex != 0 or lowerindex != 0 or mulitplechoice == True or shuffle == False or isloaded == True:
-                        if quizcommand == "k!quiz jpdb1k(1-300) 25 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100":
-                            return await message.channel.send("You can try again! There is no cooldown for the Student quiz.")
-                        print("Cheat settings detected.")
-                        await message.channel.send("Cheat settings detected.")
-                        return await fail_message(message, mainuserid, quizcommand, created_at, result)
+#                     if upperindex != 0 or lowerindex != 0 or mulitplechoice == True or shuffle == False or isloaded == True:
+#                         if quizcommand == "k!quiz jpdb1k(1-300) 25 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100":
+#                             return await message.channel.send("You can try again! There is no cooldown for the Student quiz.")
+#                         print("Cheat settings detected.")
+#                         await message.channel.send("Cheat settings detected.")
+#                         return await fail_message(message, mainuserid, quizcommand, created_at, result)
                     if scorelimit != myscore:
                         print("Score and limit don't match.")
                         await message.channel.send("Score and limit don't match.")
