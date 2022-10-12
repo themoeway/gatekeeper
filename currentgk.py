@@ -247,47 +247,42 @@ async def on_message(message: discord.Message):
                     result = "FAILED"
                     created_at = datetime.now()
                     
-#                     if upperindex != 0 or lowerindex != 0 or mulitplechoice == True or shuffle == False or isloaded == True:
-#                         if quizcommand == "k!quiz jpdb1k(1-300) 25 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100":
-#                             return await message.channel.send("You can try again! There is no cooldown for the Student quiz.")
-#                         print("Cheat settings detected.")
-#                         await message.channel.send("Cheat settings detected.")
-#                         return await fail_message(message, mainuserid, quizcommand, created_at, result)
                     if scorelimit != myscore:
                         print("Score and limit don't match.")
                         await message.channel.send("Score and limit don't match.")
-                        return await fail_message(message, mainuserid, quizcommand, created_at, result)               
+                        return await fail_message(message, mainuserid, quizcommand, created_at, result, myguild)               
                     if scorelimit < reqscorelimit:
                         print("Score too low.")
                         await message.channel.send("Score too low.")
-                        return await fail_message(message, mainuserid, quizcommand, created_at, result)  
+                        return await fail_message(message, mainuserid, quizcommand, created_at, result, myguild)  
                     if usercount > 1:
                         print("Too many users.")
                         await message.channel.send("Too many users.")
-                        return await fail_message(message, mainuserid, quizcommand, created_at, result)
+                        return await fail_message(message, mainuserid, quizcommand, created_at, result, myguild)
                     if reqanswertime < answertimelimitinms:
                         print("Answer time too long.")
                         await message.channel.send("Answer time too long.")
-                        return await fail_message(message, mainuserid, quizcommand, created_at, result)              
+                        return await fail_message(message, mainuserid, quizcommand, created_at, result, myguild)              
                     if reqfontsize < fontsize:
                         print("Font size too big.")
                         await message.channel.send("Font size too big.")
-                        return await fail_message(message, mainuserid, quizcommand, created_at, result)                 
+                        return await fail_message(message, mainuserid, quizcommand, created_at, result, myguild)                 
                     if reqfont != 'any':
                         if font != reqfont:
                             print("Font not correct.")
+                            if quizcommand == "k!quiz jpdb1k(1-300) 25 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100":
+                                return await message.channel.send("You can try again! There is no cooldown for the Student quiz.")
                             await message.channel.send("Font not correct.")
-                            return await fail_message(message, mainuserid, quizcommand, created_at, result)
+                            return await fail_message(message, mainuserid, quizcommand, created_at, result, myguild)
                     if failedquestioncount < 0:
                         print("Negative fails (Quiz aborted).")
                         await message.channel.send("Negative fails (Quiz aborted).")
-                        return await fail_message(message, mainuserid, quizcommand, created_at, result)   
+                        return await fail_message(message, mainuserid, quizcommand, created_at, result, myguild)   
                     if failedquestioncount > reqfailed:
                         print("Too many failed.")
-                        return await fail_message(message, mainuserid, quizcommand, created_at, result)
+                        return await fail_message(message, mainuserid, quizcommand, created_at, result, myguild)
                     
-                    
-                   quizwinner = myguild.get_member(mainuserid)
+                    quizwinner = myguild.get_member(mainuserid)
                     result = "PASSED"
                     currentroleid = None
                     for role in quizwinner.roles:
@@ -354,7 +349,7 @@ async def on_message(message: discord.Message):
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
-                    if newrankid == 834999083512758293 or newrankid == 834998819241459722: #if GN1 or GN2
+                    if newrankid == 834999083512758293 or newrankid == 834998819241459722:
                         buiz = newrole.name
                         announcementchannel = meido.get_channel(announcementchannelid)
                         await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
