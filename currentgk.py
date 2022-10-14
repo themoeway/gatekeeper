@@ -167,6 +167,12 @@ async def on_ready():
     print('Done initing tables')
 
 
+#TIMM: announce quizwinner
+async def announce_quizwinner(newrole, mainuserid, fred):   
+    buiz = newrole.name
+    announcementchannel = meido.get_channel(announcementchannelid)
+    return await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')    
+    
 #TIMM: adding mechanism for storing quiz tries
 async def fail_message(message, mainuserid, quizcommand, created_at, result):
     #TIMM: unlimited tries for Student role
@@ -319,6 +325,7 @@ async def on_message(message: discord.Message):
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
+                        return await announce_quizwinner(newrole, mainuserid, fred)
                     if currentroleid == 1026918330566721576 and newrankid == 1026922492884951121: #if you have divine and you did the eternal vocab quiz
                         divine_idol = myguild.get_role(currentroleid)
                         await quizwinner.remove_roles(divine_idol)
@@ -328,6 +335,7 @@ async def on_message(message: discord.Message):
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
+                        return await announce_quizwinner(newrole, mainuserid, fred)
                     if e == 2:
                         currentrole = myguild.get_role(eternal[1])
                         await quizwinner.remove_roles(currentrole)
@@ -342,6 +350,7 @@ async def on_message(message: discord.Message):
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
+                        return await announce_quizwinner(newrole, mainuserid, fred)
                     if p == 2: 
                         currentrole = myguild.get_role(prima[1])
                         await quizwinner.remove_roles(currentrole)
@@ -349,16 +358,15 @@ async def on_message(message: discord.Message):
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
-                    if newrankid == 834999083512758293 or newrankid == 834998819241459722:
-                        buiz = newrole.name
-                        announcementchannel = meido.get_channel(announcementchannelid)
-                        await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
+                        return await announce_quizwinner(newrole, mainuserid, fred)
+                    if newrankid == 834999083512758293:
+                        return await announce_quizwinner(newrole, mainuserid, fred)
+                    if newrankid == 834998819241459722:
+                        return await announce_quizwinner(newrole, mainuserid, fred)
                     if currentroleid:
                         currentrole = myguild.get_role(currentroleid)
                         await quizwinner.remove_roles(currentrole)
-                    buiz = newrole.name
-                    announcementchannel = meido.get_channel(announcementchannelid)
-                    await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
+                    await announce_quizwinner(newrole, mainuserid, fred)
                     
         except TypeError:
             pass
