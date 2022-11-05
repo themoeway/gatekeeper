@@ -359,14 +359,24 @@ async def on_message(message: discord.Message):
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
                         return await announce_quizwinner(newrole, mainuserid, fred)
-                    if newrankid == 834999083512758293:
-                        return await announce_quizwinner(newrole, mainuserid, fred)
-                    if newrankid == 834998819241459722:
-                        return await announce_quizwinner(newrole, mainuserid, fred)
+                    if newrankid == 834999083512758293 or newrankid == 834998819241459722:
+                        buiz = newrole.name
+                        announcementchannel = meido.get_channel(announcementchannelid)
+                        return await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
+                    if newrankid == 1026922492884951121 or newrankid == 1026924690029170718 or newrankid == 1027706897731702846:
+                        buiz = newrole.name
+                        announcementchannel = meido.get_channel(announcementchannelid)
+                        return await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
+                    if newrankid == currentroleid:
+                        buiz = newrole.name
+                        announcementchannel = meido.get_channel(announcementchannelid)
+                        return await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
                     if currentroleid:
                         currentrole = myguild.get_role(currentroleid)
                         await quizwinner.remove_roles(currentrole)
-                    await announce_quizwinner(newrole, mainuserid, fred)
+                    buiz = newrole.name
+                    announcementchannel = meido.get_channel(announcementchannelid)
+                    await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
                     
         except TypeError:
             pass
