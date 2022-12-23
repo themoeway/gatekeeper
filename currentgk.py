@@ -17,26 +17,22 @@ from role_db import init_tables, Store
 from datetime import date as new_date, datetime, timedelta
 import time
 
-
 welcomechannelid = 647924174995587106
 announcementchannelid = 617136489482027059
 kotobaid = 251239170058616833
 guildid = 617136488840429598
 
-
-#Student, Trainee, Debut, Major, Prima, Divine, Eternal
 ranks = [795698879227887678, 795698963494731806, 795699064409948210, 795699163144126474, 795699221365260359, 1026918330566721576, 1026918224266280960]
-eternal = [834999083512758293, 1026922492884951121] #GN1, Eternal
-divine = [834999083512758293, 1026924690029170718] #GN1, Divine
-prima = [834998819241459722, 1027706897731702846] #GN2, Prima
-
+eternal = [834999083512758293, 1026922492884951121]
+divine = [834999083512758293, 1026924690029170718]
+prima = [834998819241459722, 1027706897731702846]
 
 #TIMM: globals for quiz_attempts.db connection
 _DB_NAME = 'quiz_attempts.db'
 store = None
 
 
-#TIMM: set globals for quiz tries db
+#TIMM: set globals
 def _set_globals():
     environment = os.environ.get('ENV')
     is_prod = environment == 'prod'
@@ -54,16 +50,28 @@ def _set_globals():
 
 
 # scorelimit, answertimelimitinms, fontsize, font, rankid, failedquestioncount
+# myrankstructure = {
+#     "JPDB_大辞林_1000": (25, 120001, 100, 'Eishiikaisho', 795698879227887678, 10, "Student vocab quiz"),
+#     "JPDB_大辞林_1000": (50, 120001, 100, 'Eishiikaisho', 795698963494731806, 10, "Trainee vocab quiz"),
+#     " JPDB_大辞林_1001-2500 JPDB_大辞林_2501-5000": (50, 120001, 100, 'Eishiikaisho', 795699064409948210, 10, "Debut vocab quiz"),
+#     " JPDB_大辞林_2501-5000 JPDB_大辞林_5001-10000": (50, 120001, 100, 'Eishiikaisho', 795699163144126474, 10, "Major vocab quiz"),
+#     " JPDB_大辞林_5001-10000 JPDB_大辞林_10001-15000": (50, 120001, 100, 'Eishiikaisho', 1027706897731702846, 10, "Prima vocab quiz"),
+#     "JLPT N2 Grammar Quiz": (20, 120001, 201, 'any', 834998819241459722, 4, "N2 grammar quiz"), #current divine idol role (i.e GN2)
+#     "JLPT N1 Grammar Quiz": (20, 120001, 201, 'any', 834999083512758293, 4, "N1 grammar quiz"), #current eternal idol role (i.e GN1)
+#     " JPDB_大辞林_10001-15000 JPDB_大辞林_15001-20000": (50, 120001, 100, 'Eishiikaisho', 1026924690029170718, 10, "Divine vocab quiz"),
+#     " JPDB_大辞林_15001-20000 JPDB_大辞林_20001-25000": (50, 120001, 100, 'Eishiikaisho', 1026922492884951121, 10, "Eternal vocab quiz")
+# }
+
 myrankstructure = {
-    "JPDB_大辞林_1000": (25, 120001, 100, 'Eishiikaisho', 795698879227887678, 10, "Student vocab quiz"),
-    "JPDB_大辞林_1000": (50, 120001, 100, 'Eishiikaisho', 795698963494731806, 10, "Trainee vocab quiz"),
-    " JPDB_大辞林_1001-2500 JPDB_大辞林_2501-5000": (50, 120001, 100, 'Eishiikaisho', 795699064409948210, 10, "Debut vocab quiz"),
-    " JPDB_大辞林_2501-5000 JPDB_大辞林_5001-10000": (50, 120001, 100, 'Eishiikaisho', 795699163144126474, 10, "Major vocab quiz"),
-    " JPDB_大辞林_5001-10000 JPDB_大辞林_10001-15000": (50, 120001, 100, 'Eishiikaisho', 1027706897731702846, 10, "Prima vocab quiz"),
-    "JLPT N2 Grammar Quiz": (20, 120001, 201, 'any', 834998819241459722, 4, "N2 grammar quiz"), #current divine idol role (i.e GN2)
-    "JLPT N1 Grammar Quiz": (20, 120001, 201, 'any', 834999083512758293, 4, "N1 grammar quiz"), #current eternal idol role (i.e GN1)
-    " JPDB_大辞林_10001-15000 JPDB_大辞林_15001-20000": (50, 120001, 100, 'Eishiikaisho', 1026924690029170718, 10, "Divine vocab quiz"),
-    " JPDB_大辞林_15001-20000 JPDB_大辞林_20001-25000": (50, 120001, 100, 'Eishiikaisho', 1026922492884951121, 10, "Eternal vocab quiz")
+    "k!quiz jpdb1k(1-300) 25 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100": (25, 120001, 100, 'Eishiikaisho', 795698879227887678, 10, "Student vocab quiz"),
+    "k!quiz jpdb1k 50 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100": (50, 120001, 100, 'Eishiikaisho', 795698963494731806, 10, "Trainee vocab quiz"),
+    "k!quiz jpdb2_5k+jpdb5k 50 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100 effect=antiocr": (50, 120001, 100, 'Eishiikaisho', 795699064409948210, 10, "Debut vocab quiz"),
+    "k!quiz jpdb5k+jpdb10k 50 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100 effect=antiocr": (50, 120001, 100, 'Eishiikaisho', 795699163144126474, 10, "Major vocab quiz"),
+    "k!quiz jpdb10k+jpdb15k 50 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100 effect=antiocr": (50, 120001, 100, 'Eishiikaisho', 1027706897731702846, 10, "Prima vocab quiz"),
+    "k!quiz gn2 nd 20 mmq=4": (20, 120001, 201, 'any', 834998819241459722, 4, "N2 grammar quiz"), #current divine idol role (i.e GN2)
+    "k!quiz gn1 nd 20 mmq=4": (20, 120001, 201, 'any', 834999083512758293, 4, "N1 grammar quiz"), #current eternal idol role (i.e GN1)
+    "k!quiz jpdb15k+jpdb20k 50 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100 effect=antiocr": (50, 120001, 100, 'Eishiikaisho', 1026924690029170718, 10, "Divine vocab quiz"),
+    "k!quiz jpdb20k+jpdb25k 50 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100 effect=antiocr": (50, 120001, 100, 'Eishiikaisho', 1026922492884951121, 10, "Eternal vocab quiz")
 }
 
 # mycommands = {
@@ -92,7 +100,7 @@ intents = discord.Intents.all()
 intents.message_content = True
 intents.members = True
 
-meido = commands.Bot(command_prefix='.', intents=intents)
+meido = commands.Bot(command_prefix='!', intents=intents)
 
 
 # Extract JSON from embeds and return desired values:
@@ -165,43 +173,37 @@ async def on_ready():
     store = Store(_DB_NAME)
     init_tables(_DB_NAME)
     print('Done initing tables')
-
-
-#TIMM: announce quizwinner
-async def announce_quizwinner(newrole, mainuserid, fred):   
-    buiz = newrole.name
-    announcementchannel = meido.get_channel(announcementchannelid)
-    return await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')    
     
+
 #TIMM: adding mechanism for storing quiz tries
-async def fail_message(message, mainuserid, quizcommand, created_at, result):
-    #TIMM: unlimited tries for Student role
+async def fail_message(message, mainuserid, quizcommand, created_at, result, myguild):
     if quizcommand == "k!quiz jpdb1k(1-300) 25 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100":
         return
-    #TIMM: storeing try for every non Student ranked quiz
     store.new_quiz_attempt(mainuserid, quizcommand, created_at, result)
     unixstamp = store.get_unix()
+    user = myguild.get_member(mainuserid)
     await message.channel.send(f"Please attempt again in <t:{int(unixstamp[0])}:R> at <t:{unixstamp[0]}>. Any attempts until then will not be counted.")
-    try:
-        await message.author.send(f'Please attempt again in <t:{int(unixstamp[0])}:R> at <t:{unixstamp[0]}> (UTC). Any attempts on ``{quizcommand}`` until then will not be counted.')
-    except Exception:
-        await message.channel.send(f"<@{mainuserid}> please change your privacy settings to ``Allow direct messages from server members``. This way you can keep track of your cool down.")
-   
+    await user.send(f'Please attempt again in <t:{int(unixstamp[0])}:R> at <t:{unixstamp[0]}>. Any attempts on ``{quizcommand}`` until then will not be counted.')
 
 #TIMM: cooldown message after failed quiz    
-async def cooldown_message(message, mainuserid, quizcommand, logs, created_at):
+async def cooldown_message(message, mainuserid, quizcommand, logs, created_at, myguild):
     unixstamp = store.get_unix()
+    user = myguild.get_member(mainuserid)
     await message.channel.send(f"Please attempt again in <t:{int(unixstamp[0])}:R> at <t:{unixstamp[0]}>. Any attempts until then will not be counted.")
-    try:
-        await message.author.send(f'Please attempt again in <t:{int(unixstamp[0])}:R> at <t:{unixstamp[0]}>. Any attempts on ``{quizcommand}`` until then will not be counted.')
-    except Exception:
-        await message.channel.send(f"<@{mainuserid}> please change your privacy settings to ``Allow direct messages from server members``. This way you can keep track of your cool down.")
+    await user.send(f'Please attempt again in <t:{int(unixstamp[0])}:R> at <t:{unixstamp[0]}>. Any attempts on ``{quizcommand}`` until then will not be counted.')
     
+#TIMM: cooldown reset
+@meido.command(name="reset")
+@commands.has_any_role(627149592579801128)
+async def on_message(ctx, user: int, quizcommand: str):
+    print(user, quizcommand)
+    store.delete_cooldown(user, quizcommand)
+    return await ctx.send(f'Successfully reset the cooldown for <@{user}> on {quizcommand}')
     
 # Main Function
 @meido.event
 async def on_message(message: discord.Message): 
-    #TIMM: counting k!stopand the likes as a quiz try  
+    #TIMM: counting k!stop as a quiz try  
     if message.content.startswith("k!stop") or message.content.startswith("k!q stop") or message.content.startswith("k!cancel") or message.content.startswith("k!stop quiz"):
         async for quizinvoke in message.channel.history(limit=64):
             if quizinvoke.author == message.author:
@@ -210,13 +212,12 @@ async def on_message(message: discord.Message):
                     created_at = datetime.now()
                     result = "FAILED"
                     mainuserid = message.author.id
-                    return await fail_message(message, mainuserid, quizcommand, created_at, result)               
+                    myguild = meido.get_guild(617136488840429598)
+                    return await fail_message(message, mainuserid, quizcommand, created_at, result, myguild)               
     
-    #TIMM: checking if user does a ranked quiz
+    #TIMM: checking if user is allowed to do ranked quiz  
     if message.content.startswith("k!quiz jpdb1k") or message.content.startswith("k!quiz jpdb2_5k") or message.content.startswith("k!quiz jpdb2_5k+jpdb5k") or message.content.startswith("k!quiz jpdb5k") or message.content.startswith("k!quiz jpdb5k+jpdb10k") or message.content.startswith("k!quiz jpdb10k") or message.content.startswith("k!quiz jpdb10k+jpdb15k")  or message.content.startswith("k!quiz jpdb15k")or message.content.startswith("k!quiz gn2") or message.content.startswith("k!quiz gn1") or message.content.startswith("k!quiz jpdb15k+jpdb20k")  or message.content.startswith("k!quiz jpdb20k") or message.content.startswith("k!quiz jpdb20k+jpdb25k") or message.content.startswith("k!quiz jpdb25k"):
-        #TIMM: checking if its the exact right command
         if [command[1] for command in mycommands.values() if message.content == command[1]] != []:
-            #TIMM: allowing quiz attempt or timing out
             quizcommand = [command[1] for command in mycommands.values() if message.content == command[1]][0]
             mainuserid = message.author.id
             logs = store.get_attempts(mainuserid, quizcommand)
@@ -225,7 +226,8 @@ async def on_message(message: discord.Message):
                 return await message.channel.send("This attempt will be counted!")
             if logs[0] > 0:
                 created_at = datetime.now()
-                await cooldown_message(message, mainuserid, quizcommand, logs, created_at)
+                myguild = meido.get_guild(617136488840429598)
+                await cooldown_message(message, mainuserid, quizcommand, logs, created_at, myguild)
                 invalid_quiz = discord.utils.utcnow() + timedelta(minutes=2)
                 await message.author.timeout(invalid_quiz, reason=f'Invalid quiz attempt.')
                 return
@@ -243,7 +245,7 @@ async def on_message(message: discord.Message):
                 scorelimit, answertimelimitinms, fontsize, font, quizname, usercount, mainuserid, failedquestioncount, myscore, anticheatinfo, quizcommand = myquiz
                 upperindex, lowerindex, mulitplechoice, shuffle, isloaded = anticheatinfo
                 try:
-                    requirements = myrankstructure[quizname]
+                    requirements = myrankstructure[quizcommand]
                     reqscorelimit, reqanswertime, reqfontsize, reqfont, newrankid, reqfailed, fred = requirements
                 except KeyError:
                     print("Not a ranked quiz.")
@@ -252,7 +254,7 @@ async def on_message(message: discord.Message):
                     #TIMM: adding quiz try to db if user failed quiz
                     result = "FAILED"
                     created_at = datetime.now()
-                    
+
                     if scorelimit != myscore:
                         print("Score and limit don't match.")
                         await message.channel.send("Score and limit don't match.")
@@ -325,7 +327,6 @@ async def on_message(message: discord.Message):
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
-                        return await announce_quizwinner(newrole, mainuserid, fred)
                     if currentroleid == 1026918330566721576 and newrankid == 1026922492884951121: #if you have divine and you did the eternal vocab quiz
                         divine_idol = myguild.get_role(currentroleid)
                         await quizwinner.remove_roles(divine_idol)
@@ -335,7 +336,6 @@ async def on_message(message: discord.Message):
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
-                        return await announce_quizwinner(newrole, mainuserid, fred)
                     if e == 2:
                         currentrole = myguild.get_role(eternal[1])
                         await quizwinner.remove_roles(currentrole)
@@ -350,7 +350,6 @@ async def on_message(message: discord.Message):
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
-                        return await announce_quizwinner(newrole, mainuserid, fred)
                     if p == 2: 
                         currentrole = myguild.get_role(prima[1])
                         await quizwinner.remove_roles(currentrole)
@@ -358,15 +357,18 @@ async def on_message(message: discord.Message):
                         newrole = myguild.get_role(newrankid)
                         await quizwinner.add_roles(newrole)
                         store.save_role_info(mainuserid, newrankid, created_at)
-                        return await announce_quizwinner(newrole, mainuserid, fred)
                     if newrankid == 834999083512758293 or newrankid == 834998819241459722:
-                        buiz = newrole.name
-                        announcementchannel = meido.get_channel(announcementchannelid)
-                        return await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
+                        await message.channel.send(f"You passed the {fred}! Your role is now updated.")
+                        return
+                        # buiz = newrole.name
+                        # announcementchannel = meido.get_channel(announcementchannelid)
+                        # return await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
                     if newrankid == 1026922492884951121 or newrankid == 1026924690029170718 or newrankid == 1027706897731702846:
-                        buiz = newrole.name
-                        announcementchannel = meido.get_channel(announcementchannelid)
-                        return await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
+                        await message.channel.send(f"You passed the {fred}! Your role is now updated.")
+                        return
+                        # buiz = newrole.name
+                        # announcementchannel = meido.get_channel(announcementchannelid)
+                        # return await announcementchannel.send(f'<@!{mainuserid}> has passed the {fred} and is now a {buiz}!')
                     if newrankid == currentroleid:
                         buiz = newrole.name
                         announcementchannel = meido.get_channel(announcementchannelid)
@@ -384,4 +386,6 @@ async def on_message(message: discord.Message):
 # keep_alive.keep_alive()
 
 a = meido.run(os.environ.get('TOKEN'))
+#a = meido.run("MTAyNDY5NTAxNzUxNzg3NTI4MA.GqlLff.8ciPPRgwteprwpuXxBGj_4xTgLQ18lYr52dibo")
+
 print(a)
