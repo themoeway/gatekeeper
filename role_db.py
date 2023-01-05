@@ -43,12 +43,19 @@ class Store:
             self.conn.execute(query, (mainuserid, newrankid, created_at))
             self.conn.commit()
             
+    def check_existing_role(self, mainuserid, newrankid):
+        query = """SELECT EXISTS(SELECT * FROM roles WHERE discord_user_id= ? and role_id = ?) as didTry"""     
+        data = (mainuserid, newrankid)
+        cursor = self.conn.cursor()
+        cursor.execute(query, data)
+        return cursor.fetchone()[0]
+      
     def get_role_info(self, mainuserid, newrankid):
         query = """SELECT * FROM roles WHERE discord_user_id = ? and role_id = ?"""
         data = (mainuserid, newrankid)
         cursor = self.conn.cursor()
         cursor.execute(query, data)
-        return cursor.fetchall()
+        return cursor.fetchone()[1]
     
     def get_unix(self):
         query = "SELECT STRFTIME('%s', DATE('now', '+' || (7 - STRFTIME('%w')) || ' days'));"
@@ -60,22 +67,13 @@ def init_tables(db_name):
     return
     conn = sqlite3.connect(db_name)
     with conn:
-        conn.execute(_CREATE_ATTEMPTS_TABLE)
-        conn.execute(_CREATE_ROLES_TABLE)
+        conn.execute(_CREATE_CLUBS_TABLE)
 
-_CREATE_ATTEMPTS_TABLE = """
+_CREATE_CLUBS_TABLE = """
 CREATE TABLE IF NOT EXISTS attempts (
     discord_guild_id INTEGER,
     quiz_level TEXT,
     created_at TIMESTAMP,
     result TEXT,
-);
-"""
-
-_CREATE_ROLES_TABLE = """
-CREATE TABLE IF NOT EXISTS roles (
-    discord_guild_id INTEGER,
-    role_id int,
-    created_at TIMESTAMP,
 );
 """
