@@ -86,8 +86,8 @@ RankStructure = {
     'passed Prima vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'jpdb10k', 'jpdb15k'}), score_limit=50, max_missed=10, shuffle=True),
     'passed Divine vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'jpdb15k', 'jpdb20k'}), score_limit=50, max_missed=10, shuffle=True),
     'passed Eternal vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'jpdb20k', 'jpdb25k'}), score_limit=50, max_missed=10, shuffle=True),
-    'GN2': QuizSetting(font='Eishiikaisho', font_size=201, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'gn2'}), score_limit=20, max_missed=4, shuffle=True),
-    'GN1': QuizSetting(font='Eishiikaisho', font_size=201, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'gn1'}), score_limit=20, max_missed=4, shuffle=True),
+    'GN2': QuizSetting(font='Eishiikaisho', font_size=200, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'gn2'}), score_limit=20, max_missed=4, shuffle=True),
+    'GN1': QuizSetting(font='Eishiikaisho', font_size=200, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'gn1'}), score_limit=20, max_missed=4, shuffle=True),
 }
 QuizCommands = [i.to_command() for i in RankStructure.values()]
 pprint(QuizCommands, width=100)
@@ -230,7 +230,7 @@ class Quiz(commands.Cog):
         if not announcement_channel:
             announcement_channel = message.guild.get_channel(
                 ANNOUNCEMENT_CHANNEL_ID)
-        if not (quiz_name.endswith("vocab") and new_role.name.endswith("vocab")) or quiz_name[:2] == new_role.name[:2]:
+        if not (quiz_name.endswith("vocab") and new_role.name.endswith("vocab")) and not (quiz_name[:2] == new_role.name[:2] == "GN"):
             await announcement_channel.send(f"{member.mention} has passed the {quiz_name} quiz and is now {new_role.mention}!")
 
 class Bot(commands.Bot):
