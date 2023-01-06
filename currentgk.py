@@ -4,7 +4,6 @@ from functools import cache
 from pprint import pprint
 from re import search
 from dataclasses import dataclass
-from collections import OrderedDict
 
 import os
 import requests
@@ -92,17 +91,16 @@ RankStructure = {
 QuizCommands = [i.to_command() for i in RankStructure.values()]
 pprint(QuizCommands, width=100)
 
-# Ordered Dict, so that the order of operations is well defined when adding/removing roles
-DoubleRanks = OrderedDict([
+DoubleRanks = [
     ('Eternal Idol', [{'passed Eternal vocab', 'GN1'}, {'Divine Idol', 'passed Eternal vocab'}]),
     ('Divine Idol', [{'passed Divine vocab', 'GN1'}, {'Eternal Idol', 'passed Divine vocab'}]),
-    ('Prima Idol', [{'passed Prima vocab', 'GN2'}]),
-])
+    ('Prima Idol', [{'passed Prima vocab', 'GN2'}])
+]
 
 def get_roles(guild):
     roles = [f for k in RANK_NAMES if (f := get(guild.roles, name=k))]
     if len(roles) != len(RANK_NAMES):
-        return
+        return []
     return dict(zip(RANK_NAMES, roles))
 
 async def fail(store, quiz, guild, channel, member_id):
@@ -197,7 +195,7 @@ class Quiz(commands.Cog):
 
         async def add_double_ranks(member):
             member_roles = set(map(lambda x: x.name, member.roles))
-            for k, v in DoubleRanks.items():
+            for k, v in DoubleRanks:
                 for i in v:
                     if member_roles.issuperset(i):
                         for f in (i | {'passed Prima vocab', 'passed Divine vocab', 'passed Eternal vocab'}):
