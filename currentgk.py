@@ -76,7 +76,7 @@ class QuizSetting:
     def to_command(self):
         if list(self.decks)[0].startswith("gn"):
             return f"k!quiz {'+'.join(self.decks)} nd {self.score_limit} mmq={self.max_missed}"
-        return f"!quiz {'+'.join(self.decks)} {self.score_limit} hardcore nd mmq={self.max_missed} dauq=1 font=5 color={self.foreground} size={self.font_size}" + (f" effect={self.effect}" if self.effect != '' else '')
+        return f"k!quiz {'+'.join(self.decks)} {self.score_limit} hardcore nd mmq={self.max_missed} dauq=1 font=5 color={self.foreground} size={self.font_size}" + (f" effect={self.effect}" if self.effect != '' else '')
 
 RankStructure = {
     'Student': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'jpdb1k'}), score_limit=25, max_missed=10, shuffle=True),
@@ -118,7 +118,7 @@ async def fail(store, quiz, guild, member_id):
 all_decks = {x for _, v in RankStructure.items() for x in v.decks}
 # This is kind of big, maybe we sohuld make it range(1, 4) max?
 # Currently it is 511 elements, with 4 it would be 129, 3 -> 45
-COMB_CACHE = [f"!quiz {'+'.join(x)}" for i in range(1, len(all_decks)+1)
+COMB_CACHE = [f"k!quiz {'+'.join(x)}" for i in range(1, len(all_decks)+1)
               for x in combinations(all_decks, i)]
 
 class Quiz(commands.Cog):
