@@ -1,4 +1,3 @@
-from itertools import chain
 from itertools import combinations
 from functools import cache
 
@@ -10,8 +9,7 @@ from collections import OrderedDict
 import os
 import requests
 from asyncio import gather
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import discord
 from discord.ext import commands
@@ -24,7 +22,6 @@ ANNOUNCEMENT_CHANNEL_ID = 617136489482027059
 RANK_NAMES = ['Student', 'Trainee', 'Debut Idol', 'Major Idol', 'passed Prima vocab', 'Prima Idol',
               'passed Divine vocab', 'Divine Idol', 'passed Eternal vocab', 'Eternal Idol', 'GN1', 'GN2']
 _DB_NAME = 'quiz_attempts.db'
-
 
 @dataclass(eq=True, frozen=True)
 class QuizSetting:
@@ -81,7 +78,6 @@ class QuizSetting:
             return f"k!quiz {'+'.join(self.decks)} nd {self.score_limit} mmq={self.max_missed}"
         return f"!quiz {'+'.join(self.decks)} {self.score_limit} hardcore nd mmq={self.max_missed} dauq=1 font=5 color={self.foreground} size={self.font_size}" + (f" effect={self.effect}" if self.effect != '' else '')
 
-
 RankStructure = {
     'Student': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'jpdb1k'}), score_limit=25, max_missed=10, shuffle=True),
     'Trainee': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'jpdb1k'}), score_limit=50, max_missed=10, shuffle=True),
@@ -103,13 +99,11 @@ DoubleRanks = OrderedDict([
     ('Prima Idol', [{'passed Prima vocab', 'GN2'}]),
 ])
 
-
 def get_roles(guild):
     roles = [f for k in RANK_NAMES if (f := get(guild.roles, name=k))]
     if len(roles) != len(RANK_NAMES):
         return
     return dict(zip(RANK_NAMES, roles))
-
 
 async def fail(store, quiz, guild, member_id):
     if quiz == 'Student':
@@ -126,7 +120,6 @@ all_decks = {x for _, v in RankStructure.items() for x in v.decks}
 # Currently it is 511 elements, with 4 it would be 129, 3 -> 45
 COMB_CACHE = [f"!quiz {'+'.join(x)}" for i in range(1, len(all_decks)+1)
               for x in combinations(all_decks, i)]
-
 
 class Quiz(commands.Cog):
     def __init__(self, bot):
@@ -240,7 +233,6 @@ class Quiz(commands.Cog):
         if not quiz_name.endswith("vocab"):
             await announcement_channel.send(f"{member.mention} has passed the {quiz_name} quiz and is now {new_role.mention}!")
 
-
 class Bot(commands.Bot):
     async def on_ready(self):
         print('Logged in as:', self.user.name, "ID:", self.user.id)
@@ -248,7 +240,6 @@ class Bot(commands.Bot):
     async def setup_hook(self):
         self.store = Store(_DB_NAME)
         await self.add_cog(Quiz(self))
-
 
 if __name__ == '__main__':
     meido = Bot(command_prefix='!', intents=discord.Intents.all())
