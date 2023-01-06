@@ -159,7 +159,7 @@ class Quiz(commands.Cog):
         # Match based on the deck
         decks = {i['shortName'] for i in report['decks']}
         quiz_cand = [(k, v)
-                     for k, v in RankStructure.items() if v.decks == decks]
+                     for k, v in RankStructure.items() if set(v.decks) == decks]
         if len(quiz_cand) == 0:
             return  # Quiz that isn't ranked
 
