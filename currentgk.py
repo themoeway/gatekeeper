@@ -103,15 +103,14 @@ def get_roles(guild):
         return []
     return dict(zip(RANK_NAMES, roles))
 
-async def fail(store, quiz, guild, channel, member_id):
+async def fail(store, quiz, guild, channel, member):
     if quiz == 'Student':
         return
     quizcommand = RankStructure[quiz].to_command()
-    store.new_quiz_attempt(member_id, quizcommand, datetime.now(), "FAILED")
+    store.new_quiz_attempt(member.id, quizcommand, datetime.now(), "FAILED")
     unixstamp = store.get_unix()
-    member = guild.get_member(member_id)
-    await channel.send(f"Please attempt again in <t:{int(unixstamp)}:R> at <t:{unixstamp}>. Any attempts until then will not be counted.")
-    await member.send(f'Please attempt again in <t:{int(unixstamp)}:R> at <t:{unixstamp}>. Any attempts on ``{quizcommand}`` until then will not be counted.')
+    await channel.send(f"Please attempt again in <t:{unixstamp}:R> at <t:{unixstamp}>. Any attempts until then will not be counted.")
+    await member.send(f'Please attempt again in <t:{unixstamp}:R> at <t:{unixstamp}>. Any attempts on ``{quizcommand}`` until then will not be counted.')
 
 all_decks = {x for _, v in RankStructure.items() for x in v.decks}
 # This is kind of big, maybe we should make it range(1, 4) max?
@@ -133,10 +132,11 @@ class Quiz(commands.Cog):
                 if logs[0][0] == 0:
                     return await message.channel.send("This attempt will be counted!")
                 unixstamp = self.store.get_unix()
-                await message.channel.send(f"Please attempt again in <t:{int(unixstamp)}:R> at <t:{unixstamp}>. Any attempts until then will not be counted.")
-                await message.guild.get_member(message.author.id).send(f'Please attempt again in <t:{int(unixstamp)}:R> at <t:{unixstamp}>. Any attempts on ``{message.content}`` until then will not be counted.')
+                await message.channel.send(f"Please attempt again in <t:{unixstamp}:R> at <t:{unixstamp}>. Any attempts until then will not be counted.")
+                await message.guild.get_member(message.author.id).send(f'Please attempt again in <t:{unixstamp}:R> at <t:{unixstamp}>. Any attempts on ``{message.content}`` until then will not be counted.')
                 return await message.author.timeout(utcnow() + timedelta(minutes=2), reason="Invalid quiz attempt")
 
+            await fail(self.store, "Trainee", message.guild, message.channel, message.author)
             await message.channel.send("Wrong quiz command")
             return await message.author.timeout(utcnow() + timedelta(minutes=5), reason="Wrong quiz command")
 
@@ -164,25 +164,24 @@ class Quiz(commands.Cog):
 
         # Match based on the settings
         report_settings = QuizSetting.from_dict(report)
+        member = message.guild.get_member(
+            int(report['participants'][0]['discordUser']['id']))
+
         similarity = *sorted([(k, v.similar(report_settings))
                              for k, v in quiz_cand], key=lambda x: len(x[1])),
         if len(similarity[0][1]) > 0:
             await message.channel.send('\n'.join(similarity[0][1]))
-            return await fail(self.store, similarity[0][0], message.guild, message.channel, int(report['participants'][0]['discordUser']['id']))
+            return await fail(self.store, similarity[0][0], message.guild, message.channel, member)
 
         # Sort based on the distance to score_limit, hack to fix student getting assigned instead of trainee
         similarity = *sorted([i for i in similarity if len(i[1]) == 0],
                              key=lambda x: -RankStructure[x[0]].score_limit),
-
         quiz_name = similarity[0][0]
 
         if len(report['participants']) > 1:
             await message.channel.send('Too many participants.')
             # This poor guy
-            return await fail(self.store, quiz_name, message.guild, message.channel, int(report['participants'][0]['discordUser']['id']))
-
-        member = message.guild.get_member(
-            int(report['participants'][0]['discordUser']['id']))
+            return await fail(self.store, quiz_name, message.guild, message.channel, member)
 
         before = frozenset(member.roles)
         print(before)
