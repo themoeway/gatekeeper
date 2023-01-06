@@ -239,5 +239,5 @@ class Bot(commands.Bot):
 
 if __name__ == '__main__':
     meido = Bot(command_prefix='!', intents=discord.Intents.all())
-    meido.run("OTUxMDIwNDcwNDU3NzYxODQy.YihY1Q.CwIx3FJztTicucNELqPOm4FY8Hw")
+    meido.run("TOKEN")
     #meido.run(os.environ['TOKEN'])
