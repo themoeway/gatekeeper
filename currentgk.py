@@ -34,7 +34,8 @@ class QuizSetting:
     additional_answer_time_limit: int
 
     # TODO(ym): deck ranges
-    decks: frozenset[str]
+    #decks: frozenset[str]
+    decks: list
     score_limit: int
 
     max_missed: int
@@ -78,17 +79,17 @@ class QuizSetting:
         return f"k!quiz {'+'.join(self.decks)} {self.score_limit} hardcore nd mmq={self.max_missed} dauq=1 font=5 color={self.foreground} size={self.font_size}" + (f" effect={self.effect}" if self.effect != '' else '')
 
 RankStructure = {
-    'Student': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'jpdb1k'}), score_limit=25, max_missed=10, shuffle=True),
-    'Trainee': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'jpdb1k'}), score_limit=50, max_missed=10, shuffle=True),
-    'Debut Idol': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'jpdb2_5k', 'jpdb5k'}), score_limit=50, max_missed=10, shuffle=True),
-    'Major Idol': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'jpdb5k', 'jpdb10k'}), score_limit=50, max_missed=10, shuffle=True),
-    'passed Prima vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'jpdb10k', 'jpdb15k'}), score_limit=50, max_missed=10, shuffle=True),
-    'passed Divine vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'jpdb15k', 'jpdb20k'}), score_limit=50, max_missed=10, shuffle=True),
-    'passed Eternal vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'jpdb20k', 'jpdb25k'}), score_limit=50, max_missed=10, shuffle=True),
-    'GN2': QuizSetting(font='Eishiikaisho', font_size=200, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'gn2'}), score_limit=20, max_missed=4, shuffle=True),
-    'GN1': QuizSetting(font='Eishiikaisho', font_size=200, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=frozenset({'gn1'}), score_limit=20, max_missed=4, shuffle=True),
+    'Student': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb1k'], score_limit=25, max_missed=10, shuffle=True),
+    'Trainee': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb1k'], score_limit=50, max_missed=10, shuffle=True),
+    'Debut Idol': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb2_5k', 'jpdb5k'], score_limit=50, max_missed=10, shuffle=True),
+    'Major Idol': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb5k', 'jpdb10k'], score_limit=50, max_missed=10, shuffle=True),
+    'passed Prima vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb10k', 'jpdb15k'], score_limit=50, max_missed=10, shuffle=True),
+    'passed Divine vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb15k', 'jpdb20k'], score_limit=50, max_missed=10, shuffle=True),
+    'passed Eternal vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb20k', 'jpdb25k'], score_limit=50, max_missed=10, shuffle=True),
+    'GN2': QuizSetting(font='Eishiikaisho', font_size=200, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['gn2'], score_limit=20, max_missed=4, shuffle=True),
+    'GN1': QuizSetting(font='Eishiikaisho', font_size=200, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['gn1'], score_limit=20, max_missed=4, shuffle=True),
 }
-QuizCommands = [i.to_command() for i in RankStructure.values()]
+QuizCommands = [i.to_command() for i in RankStructure.values()] + ['k!quiz jpdb1k(1-300) 25 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100 effect=antiocr']
 pprint(QuizCommands, width=100)
 
 DoubleRanks = [
