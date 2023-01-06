@@ -1,5 +1,5 @@
 from itertools import combinations
-from functools import cache
+#from functools import cache
 
 from pprint import pprint
 from re import search
@@ -22,20 +22,19 @@ RANK_NAMES = ['Student', 'Trainee', 'Debut Idol', 'Major Idol', 'passed Prima vo
               'passed Divine vocab', 'Divine Idol', 'passed Eternal vocab', 'Eternal Idol', 'GN1', 'GN2']
 _DB_NAME = 'quiz_attempts.db'
 
-@dataclass(eq=True, frozen=True)
+@dataclass(eq=True)
 class QuizSetting:
     font: str
     font_size: int
     foreground: str
-    background: str
     effect: str
 
     time_limit: int
     additional_answer_time_limit: int
 
     # TODO(ym): deck ranges
-    #decks: frozenset[str]
     decks: list
+    #decks: frozenset([str])
     score_limit: int
 
     max_missed: int
@@ -43,9 +42,9 @@ class QuizSetting:
 
     def similar(self, other):
         errors = []
-        if self.foreground != other.foreground or self.background != other.background or self.effect != other.effect or self.decks != other.decks or self.shuffle != other.shuffle:
+        if self.foreground != other.foreground or self.effect != other.effect or set(self.decks) != set(other.decks) or self.shuffle != other.shuffle:
             errors.append('Quiz settings are different')
-        if other.additional_answer_time_limit > self.additional_answer_time_limit:
+        if other.time_limit > self.time_limit or other.additional_answer_time_limit > self.additional_answer_time_limit:
             errors.append("Answer time too long.")
         if other.font_size > self.font_size:
             errors.append("Font size too big.")
@@ -63,7 +62,6 @@ class QuizSetting:
                    font=s['font'],
                    font_size=s['fontSize'],
                    foreground=s['fontColor'],
-                   background=s['backgroundColor'],
                    effect=s['effect'] if 'effect' in s else '',
                    time_limit=s['answerTimeLimitInMs'],
                    additional_answer_time_limit=s['additionalAnswerWaitTimeInMs'],
@@ -72,22 +70,22 @@ class QuizSetting:
                    shuffle=s['shuffle'] if 'shuffle' in s else s['serverSettings']['shuffle'])
 
     # I don't like this
-    @cache
+    #@cache
     def to_command(self):
         if list(self.decks)[0].startswith("gn"):
-            return f"k!quiz {'+'.join(self.decks)} nd {self.score_limit} mmq={self.max_missed}"
-        return f"k!quiz {'+'.join(self.decks)} {self.score_limit} hardcore nd mmq={self.max_missed} dauq=1 font=5 color={self.foreground} size={self.font_size}" + (f" effect={self.effect}" if self.effect != '' else '')
+            return f"k!quiz {'+'.join((self.decks))} nd {self.score_limit} mmq={self.max_missed}"
+        return f"k!quiz {'+'.join((self.decks))} {self.score_limit} hardcore nd mmq={self.max_missed} dauq=1 font=5 color={self.foreground} size={self.font_size}" + (f" effect={self.effect}" if self.effect != '' else '')
 
 RankStructure = {
-    'Student': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='#000000', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb1k'], score_limit=25, max_missed=10, shuffle=True),
-    'Trainee': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='#000000', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb1k'], score_limit=50, max_missed=10, shuffle=True),
-    'Debut Idol': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='#000000', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb2_5k', 'jpdb5k'], score_limit=50, max_missed=10, shuffle=True),
-    'Major Idol': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='#000000', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb5k', 'jpdb10k'], score_limit=50, max_missed=10, shuffle=True),
-    'passed Prima vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='#000000', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb10k', 'jpdb15k'], score_limit=50, max_missed=10, shuffle=True),
-    'passed Divine vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='#000000', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb15k', 'jpdb20k'], score_limit=50, max_missed=10, shuffle=True),
-    'passed Eternal vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', background='#000000', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb20k', 'jpdb25k'], score_limit=50, max_missed=10, shuffle=True),
-    'GN2': QuizSetting(font='Eishiikaisho', font_size=200, foreground='#f173ff', background='#000000', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['gn2'], score_limit=20, max_missed=4, shuffle=True),
-    'GN1': QuizSetting(font='Eishiikaisho', font_size=200, foreground='#f173ff', background='#000000', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['gn1'], score_limit=20, max_missed=4, shuffle=True),
+    'Student': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', effect= '', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb1k'], score_limit=25, max_missed=10, shuffle=True),
+    'Trainee': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb1k'], score_limit=50, max_missed=10, shuffle=True),
+    'Debut Idol': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb2_5k', 'jpdb5k'], score_limit=50, max_missed=10, shuffle=True),
+    'Major Idol': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb5k', 'jpdb10k'], score_limit=50, max_missed=10, shuffle=True),
+    'passed Prima vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb10k', 'jpdb15k'], score_limit=50, max_missed=10, shuffle=True),
+    'passed Divine vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb15k', 'jpdb20k'], score_limit=50, max_missed=10, shuffle=True),
+    'passed Eternal vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb20k', 'jpdb25k'], score_limit=50, max_missed=10, shuffle=True),
+    'GN2': QuizSetting(font='Eishiikaisho', font_size=200, foreground='#f173ff', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['gn2'], score_limit=20, max_missed=4, shuffle=True),
+    'GN1': QuizSetting(font='Eishiikaisho', font_size=200, foreground='#f173ff', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['gn1'], score_limit=20, max_missed=4, shuffle=True),
 }
 QuizCommands = [i.to_command() for i in RankStructure.values()] + ['k!quiz jpdb1k(1-300) 25 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100']
 pprint(QuizCommands, width=100)
@@ -191,7 +189,7 @@ class Quiz(commands.Cog):
             await member.add_roles(guild_roles[quiz_name])
         else:
             await message.channel.send("Score and limit don't match.")
-            return await fail(self.store, quiz_name, message.guild, message.channel, member.id)
+            return await fail(self.store, quiz_name, message.guild, message.channel, member)
 
         async def add_double_ranks(member):
             member_roles = set(map(lambda x: x.name, member.roles))
@@ -241,4 +239,5 @@ class Bot(commands.Bot):
 
 if __name__ == '__main__':
     meido = Bot(command_prefix='!', intents=discord.Intents.all())
-    meido.run(os.environ['TOKEN'])
+    meido.run("OTUxMDIwNDcwNDU3NzYxODQy.YihY1Q.CwIx3FJztTicucNELqPOm4FY8Hw")
+    #meido.run(os.environ['TOKEN'])
