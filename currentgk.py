@@ -230,7 +230,7 @@ class Quiz(commands.Cog):
         if not announcement_channel:
             announcement_channel = message.guild.get_channel(
                 ANNOUNCEMENT_CHANNEL_ID)
-        if not quiz_name.endswith("vocab"):
+        if not (quiz_name.endswith("vocab") and new_role.name.endswith("vocab")) or quiz_name[:2] == new_role.name[:2]:
             await announcement_channel.send(f"{member.mention} has passed the {quiz_name} quiz and is now {new_role.mention}!")
 
 class Bot(commands.Bot):
