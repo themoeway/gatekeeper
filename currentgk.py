@@ -89,7 +89,7 @@ RankStructure = {
     'GN2': QuizSetting(font='Eishiikaisho', font_size=200, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['gn2'], score_limit=20, max_missed=4, shuffle=True),
     'GN1': QuizSetting(font='Eishiikaisho', font_size=200, foreground='#f173ff', background='rgb(255, 255, 255)', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['gn1'], score_limit=20, max_missed=4, shuffle=True),
 }
-QuizCommands = [i.to_command() for i in RankStructure.values()] + ['k!quiz jpdb1k(1-300) 25 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100 effect=antiocr']
+QuizCommands = [i.to_command() for i in RankStructure.values()] + ['k!quiz jpdb1k(1-300) 25 hardcore nd mmq=10 dauq=1 font=5 color=#f173ff size=100']
 pprint(QuizCommands, width=100)
 
 DoubleRanks = [
