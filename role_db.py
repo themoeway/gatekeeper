@@ -32,13 +32,19 @@ class Store:
             self.conn.execute(
                 query, (mainuserid, quizcommand, created_at, result))
 
+    def get_last_attempt(self, mainuserid):
+        query = """SELECT quiz_level, created_at, result FROM attempts WHERE discord_user_id = ? ORDER BY created_at DESC LIMIT 1"""
+        cursor = self.conn.cursor()
+        cursor.execute(query, (mainuserid,))
+        return cursor.fetchall()[0] # TODO(YM): error checking
+
     def get_attempts(self, mainuserid, quizname):
         query = """SELECT EXISTS(
-        SELECT * FROM attempts WHERE discord_user_id = ? AND quiz_level = ? AND created_at >= DATE('now', '-' || STRFTIME('%w') || ' days')
+        SELECT * FROM attempts WHERE discord_user_id = ? AND quiz_level = ? AND created_at >= DATE('now', '-' || STRFTIME('%w') || ' days') AND result = 'FAILED'
         ) AS didTry"""
         cursor = self.conn.cursor()
         cursor.execute(query, (mainuserid, quizname))
-        return cursor.fetchall()
+        return cursor.fetchall()[0][0] == 1 # 1 True 0 False
 
     def get_cooldown(self, mainuserid, quizname):
         query = "SELECT quiz_level, created_at FROM attempts WHERE discord_user_id = ? AND quiz_level = ?"
