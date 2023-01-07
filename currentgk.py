@@ -83,7 +83,7 @@ class QuizSetting:
 
 RankStructure = {
     'Student': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', effect=None, time_limit=16000, additional_answer_time_limit=0, decks=['jpdb1k'], deck_range=(1, 300), score_limit=25, max_missed=10, shuffle=True),
-    'Trainee': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb1k'], deck_range=None, score_limit=50, max_missed=10, shuffle=True),
+    'Trainee': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', effect=None, time_limit=16000, additional_answer_time_limit=0, decks=['jpdb1k'], deck_range=None, score_limit=50, max_missed=10, shuffle=True),
     'Debut Idol': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb2_5k', 'jpdb5k'], deck_range=None, score_limit=50, max_missed=10, shuffle=True),
     'Major Idol': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb5k', 'jpdb10k'], deck_range=None, score_limit=50, max_missed=10, shuffle=True),
     'passed Prima vocab': QuizSetting(font='Eishiikaisho', font_size=100, foreground='#f173ff', effect='antiocr', time_limit=16000, additional_answer_time_limit=0, decks=['jpdb10k', 'jpdb15k'], deck_range=None, score_limit=50, max_missed=10, shuffle=True),
@@ -141,7 +141,7 @@ class Quiz(commands.Cog):
         nqr = list(nqr)[0]
         last_quiz, created_at, result = self.store.get_last_attempt(before.id)
         quiz_name = [k for k, v in RankStructure.items() if v.to_command() == last_quiz][0]
-        if (nqr.name not in {k for k, v in DoubleRanks} and nqr.name != quiz_name) or (datetime.now() - created_at) > timedelta(hours=1) or result != "PASSED":  # Sanity check
+        if (nqr.name != quiz_name and nqr.name.split(" ")[0] not in quiz_name) or (datetime.now() - datetime.fromisoformat(created_at)) > timedelta(minutes=25) or result != "PASSED":  # Sanity check
             return
 
         member = before.guild.get_member(before.id)
@@ -162,7 +162,7 @@ class Quiz(commands.Cog):
             await member.remove_roles(*rr)
 
             announcement_channel = get(member.guild.channels, name='一般') or member.guild.get_channel(ANNOUNCEMENT_CHANNEL_ID)
-            await announcement_channel.send(f"{member.mention} has passed the {quiz_name} quiz and is now {nqr.mention}!")
+            await announcement_channel.send(f"{member.mention} has passed the {quiz_name} quiz and is now {nqr.name}!")
 
     @commands.Cog.listener()
     async def on_message(self, message):
