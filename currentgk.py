@@ -1,5 +1,6 @@
-from itertools import combinations
+from itertools import combinations, chain
 from pprint import pprint
+from collections import OrderedDict
 from re import search
 from dataclasses import dataclass
 
@@ -95,11 +96,11 @@ RankStructure = {
 QuizCommands = [i.to_command() for i in RankStructure.values()]
 pprint(QuizCommands, width=100)
 
-DoubleRanks = [
+DoubleRanks = OrderedDict([
     ('Eternal Idol', [{'passed Eternal vocab', 'GN1'}, {'Divine Idol', 'passed Eternal vocab'}]),
     ('Divine Idol', [{'passed Divine vocab', 'GN1'}, {'Eternal Idol', 'passed Divine vocab'}]),
     ('Prima Idol', [{'passed Prima vocab', 'GN2'}])
-]
+])
 
 def get_roles(guild):
     roles = [f for k in RANK_NAMES if (f := get(guild.roles, name=k))]
@@ -141,20 +142,20 @@ class Quiz(commands.Cog):
         nqr = list(nqr)[0]
         last_quiz, created_at, result = self.store.get_last_attempt(before.id)
         quiz_name = [k for k, v in RankStructure.items() if v.to_command() == last_quiz][0]
-        if (nqr.name != quiz_name and nqr.name.split(" ")[0] not in quiz_name) or (datetime.now() - datetime.fromisoformat(created_at)) > timedelta(minutes=25) or result != "PASSED":  # Sanity check
+        if result != "PASSED" or datetime.now() - datetime.fromisoformat(created_at) > timedelta(minutes=2) or (nqr.name != quiz_name and (nqr.name not in DoubleRanks or quiz_name not in chain(*DoubleRanks[nqr.name]))): # Sanity check
             return
 
         member = before.guild.get_member(before.id)
         after_roles = set(map(lambda x: x.name, after.roles))
-        for k, v in DoubleRanks:
-            for i in v:
+        for k in filter(lambda k: k not in after_roles, DoubleRanks):
+            for i in DoubleRanks[k]:
                 # on_member_update will get called again
-                if k not in after_roles and after_roles.issuperset(i):
+                if after_roles.issuperset(i):
                     return await member.add_roles(guild_roles[k])
 
         if quiz_name.startswith("passed"):
-            _, z1, z2 = quiz_name.split(" ")
-            quiz_name = f"{z1} Idol {z2}"
+            quiz_name = quiz_name.split(" ")[1] + " Idol"
+        quiz_name += " grammar" if quiz_name.startswith("GN") else " vocab"
         await member.send(f"You passed the {quiz_name} quiz! Your role is now updated.")
 
         if not nqr.name.startswith("passed") and not nqr.name.startswith("GN"):
@@ -162,7 +163,7 @@ class Quiz(commands.Cog):
             await member.remove_roles(*rr)
 
             announcement_channel = get(member.guild.channels, name='一般') or member.guild.get_channel(ANNOUNCEMENT_CHANNEL_ID)
-            await announcement_channel.send(f"{member.mention} has passed the {quiz_name} quiz and is now {nqr.name}!")
+            await announcement_channel.send(f"{member.mention} has passed the {quiz_name} quiz and is now a {nqr.name}!")
 
     @commands.Cog.listener()
     async def on_message(self, message):
