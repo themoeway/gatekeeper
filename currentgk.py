@@ -175,8 +175,24 @@ class Quiz(commands.Cog):
                 return await message.author.timeout(utcnow() + timedelta(minutes=2), reason="Invalid quiz attempt")
 
             await message.channel.send("Wrong quiz command")
-            return await message.author.timeout(utcnow() + timedelta(minutes=5), reason="Wrong quiz command")
+            await message.author.timeout(utcnow() + timedelta(minutes=5), reason="Wrong quiz command")
+            await message.channel.set_permissions(message.channel.guild.default_role, view_channel=False)
+            await message.channel.set_permissions(message.channel.guild.default_role, send_messages=False)
+            await asyncio.sleep(300)
+            await message.channel.set_permissions(message.channel.guild.default_role, view_channel=True)
+            await message.channel.set_permissions(message.channel.guild.default_role, send_messages=True)
+            return await message.channel.set_permissions(message.channel.guild.default_role, read_message_history=False)
 
+        if "k!" in message.content and "jpdb" in message.content and "conquest" in message.content:
+            await message.channel.send("Wrong quiz command")
+            await message.author.timeout(utcnow() + timedelta(minutes=5), reason="Wrong quiz command")
+            await message.channel.set_permissions(message.channel.guild.default_role, view_channel=False)
+            await message.channel.set_permissions(message.channel.guild.default_role, send_messages=False)
+            await asyncio.sleep(300)
+            await message.channel.set_permissions(message.channel.guild.default_role, view_channel=True)
+            await message.channel.set_permissions(message.channel.guild.default_role, send_messages=True)
+            return await message.channel.set_permissions(message.channel.guild.default_role, read_message_history=False)
+      
         if not message.embeds or message.author.id != KOTOBA_ID:
             return
 
