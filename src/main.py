@@ -32,8 +32,8 @@ for key, value in expected_env_vars.items():
 if len(env_vars_missing) > 0:
     raise KeyError("Certain env vars are not set:" + env_vars_missing)
 
-KOTOBA_ID = os.environ(expected_env_vars["kotoba"])
-ANNOUNCEMENT_CHANNEL_ID = os.environ(expected_env_vars["channel"])
+KOTOBA_ID = os.environ[expected_env_vars["kotoba"]]
+ANNOUNCEMENT_CHANNEL_ID = os.environ[expected_env_vars["channel"]]
 RANK_NAMES = ['Student', 'Trainee', 'Debut Idol', 'Major Idol', 'passed Prima vocab', 'Prima Idol',
               'passed Divine vocab', 'Divine Idol', 'passed Eternal vocab', 'Eternal Idol', 'GN1', 'GN2']
 _DB_NAME = 'quiz_attempts.db'
