@@ -15,8 +15,20 @@ from discord.utils import get, utcnow
 
 from role_db import Store
 
-KOTOBA_ID = 251239170058616833
-ANNOUNCEMENT_CHANNEL_ID = 617136489482027059
+expected_env_vars = ["KOTOBA_ID", "ANNOUNCEMENT_CHANNEL_ID"]
+
+# Sanity checks
+env_vars_missing = ""
+for env_var in expected_env_vars:
+    if not os.getenv(env_var):
+        env_vars_missing = env_vars_missing + f" {env_var}"
+        # "ENV_VAR1 ENV_VAR2 ..."
+        
+if len(env_vars_missing) > 0:
+    raise Exception("Certain env vars are not set:" + env_vars_missing)
+
+KOTOBA_ID = os.getenv(expected_env_vars[0])
+ANNOUNCEMENT_CHANNEL_ID = os.getenv(expected_env_vars[1])
 RANK_NAMES = ['Student', 'Trainee', 'Debut Idol', 'Major Idol', 'passed Prima vocab', 'Prima Idol',
               'passed Divine vocab', 'Divine Idol', 'passed Eternal vocab', 'Eternal Idol', 'GN1', 'GN2']
 _DB_NAME = 'quiz_attempts.db'
