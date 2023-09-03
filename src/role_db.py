@@ -1,5 +1,6 @@
-import os
 import sqlite3
+import warnings
+from os.path import exists
 
 _CREATE_ATTEMPTS_TABLE = """
 CREATE TABLE IF NOT EXISTS attempts (
@@ -20,6 +21,9 @@ CREATE TABLE IF NOT EXISTS roles (
 
 class Store:
     def __init__(self, db_name):
+        if not exists(db_name):
+            warnings.warn(f"Database 'f{db_name}' was not found")
+        
         self.conn = sqlite3.connect(
             db_name, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         with self.conn:

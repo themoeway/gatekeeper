@@ -15,20 +15,25 @@ from discord.utils import get, utcnow
 
 from role_db import Store
 
-expected_env_vars = ["KOTOBA_ID", "ANNOUNCEMENT_CHANNEL_ID"]
+expected_env_vars = {
+    "kotoba": "KOTOBA_ID",
+    "channel": "ANNOUNCEMENT_CHANNEL_ID",
+    "token": "TOKEN"
+}
+# Keep order as is
 
-# Sanity checks
+# Env vars sanity checks
 env_vars_missing = ""
-for env_var in expected_env_vars:
-    if not os.getenv(env_var):
-        env_vars_missing = env_vars_missing + f" {env_var}"
+for key, value in expected_env_vars.items():
+    if not os.getenv(value):
+        env_vars_missing = env_vars_missing + f" {value}"
         # "ENV_VAR1 ENV_VAR2 ..."
         
 if len(env_vars_missing) > 0:
-    raise Exception("Certain env vars are not set:" + env_vars_missing)
+    raise KeyError("Certain env vars are not set:" + env_vars_missing)
 
-KOTOBA_ID = os.getenv(expected_env_vars[0])
-ANNOUNCEMENT_CHANNEL_ID = os.getenv(expected_env_vars[1])
+KOTOBA_ID = os.environ(expected_env_vars["kotoba"])
+ANNOUNCEMENT_CHANNEL_ID = os.environ(expected_env_vars["channel"])
 RANK_NAMES = ['Student', 'Trainee', 'Debut Idol', 'Major Idol', 'passed Prima vocab', 'Prima Idol',
               'passed Divine vocab', 'Divine Idol', 'passed Eternal vocab', 'Eternal Idol', 'GN1', 'GN2']
 _DB_NAME = 'quiz_attempts.db'
@@ -264,4 +269,4 @@ class Bot(commands.Bot):
 
 if __name__ == '__main__':
     meido = Bot(command_prefix='!', intents=discord.Intents.all())
-    meido.run(os.environ['TOKEN'])
+    meido.run(os.environ[expected_env_vars["token"]])
