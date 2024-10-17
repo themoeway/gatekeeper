@@ -18,7 +18,7 @@ Below are a few guidelines to ensure contributions have a good level of quality 
 
 ## Setup
 
-The immersion bot uses [Python 3.9.0](https://www.python.org/downloads/release/python-390/) and [pip 24.2](https://discuss.python.org/t/announcement-pip-24-2-release/59402) tools for building and testing.
+The gatekeeper bot uses [Python 3.9.0](https://www.python.org/downloads/release/python-390/) and [pip 24.2](https://discuss.python.org/t/announcement-pip-24-2-release/59402) tools for building and testing.
 
 ##  Testing
 
