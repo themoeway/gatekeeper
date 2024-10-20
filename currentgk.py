@@ -167,31 +167,18 @@ class Quiz(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if any(message.content.startswith(i) for i in COMB_CACHE):
-            if message.content in QuizCommands:
-                if not self.store.get_attempts(message.author.id, message.content):
+        message_content = message.content.lower()
+        if any(message_content.startswith(i) for i in COMB_CACHE):
+            if message_content in QuizCommands:
+                if not self.store.get_attempts(message.author.id, message_content):
                     return await message.channel.send("This attempt will be counted!")
-                await cooldown(self.store, message.channel, message.author, message.content)
+                await cooldown(self.store, message.channel, message.author, message_content)
+                if message.channel.id == 1124491277912772658:
+                    return await message.author.timeout(utcnow() + timedelta(minutes=2), reason="Invalid quiz attempt")
                 return await message.author.timeout(utcnow() + timedelta(minutes=2), reason="Invalid quiz attempt")
 
-            await message.channel.send("Wrong quiz command")
-            await message.author.timeout(utcnow() + timedelta(minutes=5), reason="Wrong quiz command")
-            await message.channel.set_permissions(message.channel.guild.default_role, view_channel=False)
-            await message.channel.set_permissions(message.channel.guild.default_role, send_messages=False)
-            await asyncio.sleep(300)
-            await message.channel.set_permissions(message.channel.guild.default_role, view_channel=True)
-            await message.channel.set_permissions(message.channel.guild.default_role, send_messages=True)
-            return await message.channel.set_permissions(message.channel.guild.default_role, read_message_history=False)
-
-        if "k!" in message.content and "jpdb" in message.content and "conquest" in message.content:
-            await message.channel.send("Wrong quiz command")
-            await message.author.timeout(utcnow() + timedelta(minutes=5), reason="Wrong quiz command")
-            await message.channel.set_permissions(message.channel.guild.default_role, view_channel=False)
-            await message.channel.set_permissions(message.channel.guild.default_role, send_messages=False)
-            await asyncio.sleep(300)
-            await message.channel.set_permissions(message.channel.guild.default_role, view_channel=True)
-            await message.channel.set_permissions(message.channel.guild.default_role, send_messages=True)
-            return await message.channel.set_permissions(message.channel.guild.default_role, read_message_history=False)
+        if message_content.startswith("k!") and "jpdb" in message_content and message_content not in QuizCommands:
+            return await message.author.timeout(utcnow() + timedelta(minutes=2), reason="Invalid quiz attempt")
       
         if not message.embeds or message.author.id != KOTOBA_ID:
             return
